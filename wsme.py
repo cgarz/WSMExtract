@@ -84,7 +84,8 @@ def main():
        passed paths exist and that they have the correct file extension. Print progress for each input.
        process_file deals with per file progress."""
 
-    parser = ArgumentParser(description='WSM Extract (wsme). A tool to extract the various sections of a WSM file.')
+    parser = ArgumentParser(description='WSM Extract (wsme). A tool to extract the various sections of a Worms World' + 
+                                        ' Party Aqua (WWPA) WSM file.')
     parser.add_argument('-e', '--extract', type=str.upper, nargs='?', default=None, metavar='SECTION[,SECTION ...]',
                         help='A comma separated list of sections (FourCC) to extract. Defaults to all sections.' +
                              ' Valid sections: ' + ','.join((s.decode().strip() for s in FILE_SECTIONS)) +
@@ -94,7 +95,7 @@ def main():
                              ' input folder.')
     parser.add_argument('-f', '--force-overwrite', action='store_true', help='Allow overwriting files.')
     parser.add_argument('inputs', type=str, nargs='+', metavar='File_or_Folder',
-                        help='One or more files or folders (non recursive) to process')
+                        help='One or more files and/or folders (non recursive) to process')
     args = parser.parse_args()
 
     if args.output is not None:
