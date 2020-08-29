@@ -25,15 +25,15 @@ def validate_sections(section_list):
     return tuple(validated_sections)
 
 
-def get_filename(basename, fourCC):
+def get_filename(basename, four_cc):
     """Handle any changes that may be needed for a specific section. Such as LAND_*.DAT prefix and suffix and stripping
        extraneous whitespace. Return the file basename and decoded FourCC extension otherwise."""
 
-    if fourCC == b'WAM ':
+    if four_cc == b'WAM ':
         return basename + '.WAM'
-    if fourCC == b'IMG ':
+    if four_cc == b'IMG ':
         return 'LAND_' + basename + '.DAT'
-    return basename + '.' + fourCC.decode().strip()
+    return basename + '.' + four_cc.decode().strip()
 
 
 def process_file(file_path, output_dir_root, save_sections, overwrite):
@@ -50,19 +50,19 @@ def process_file(file_path, output_dir_root, save_sections, overwrite):
             in_file.seek(4, 1)  # skip size
 
         while True:
-            fourCC = in_file.read(4)
-            if not fourCC:
+            four_cc = in_file.read(4)
+            if not four_cc:
                 return True  # no more data, done.
 
-            if not fourCC in FILE_SECTIONS:
-                print(f'{fourCC} is not a valid {FILE_EXTENSION} section. Skipping file')
+            if four_cc not in FILE_SECTIONS:
+                print(f'{four_cc} is not a valid {FILE_EXTENSION} section. Skipping file')
                 return False
             length = int.from_bytes(in_file.read(4), byteorder='little', signed=False)
 
-            if fourCC in save_sections:
+            if four_cc in save_sections:
                 output_basename = os.path.basename(file_path)[:-4]
                 output_dir = os.path.join(output_dir_root, output_basename)
-                output_filename = get_filename(output_basename, fourCC)
+                output_filename = get_filename(output_basename, four_cc)
                 output_path = os.path.join(output_dir, output_filename)
                 if not os.path.isdir(output_dir):
                     os.mkdir(output_dir)
@@ -118,21 +118,21 @@ def main():
         print(count, 'inputs to process')
     print()
 
-    for input_idx, input in enumerate(args.inputs, start=1):
-        if not os.path.exists(input):
-            print('Skipping non existent input:', {input})
+    for input_idx, input_path in enumerate(args.inputs, start=1):
+        if not os.path.exists(input_path):
+            print('Skipping non existent input:', {input_path})
             continue
 
-        if os.path.isdir(input):
+        if os.path.isdir(input_path):
             if len(args.inputs) > 1:
-                print('Processing input:', input)
-            output_dir = args.output if args.output else input
-            file_paths = [os.path.join(input, f) for f in os.listdir(input) if f.upper().endswith(FILE_EXTENSION)]
+                print('Processing input:', input_path)
+            output_dir = args.output if args.output else input_path
+            file_paths = [os.path.join(input_path, f) for f in os.listdir(input_path) if f.upper().endswith(FILE_EXTENSION)]
             if (count := len(file_paths)) > 1:
                 print(count, 'files to process')
         else:
-            output_dir = args.output if args.output else os.path.dirname(input)
-            file_paths = [input]
+            output_dir = args.output if args.output else os.path.dirname(input_path)
+            file_paths = [input_path]
 
         for file_idx, file_path in enumerate(file_paths, start=1):
             if not file_path.upper().endswith(FILE_EXTENSION):
